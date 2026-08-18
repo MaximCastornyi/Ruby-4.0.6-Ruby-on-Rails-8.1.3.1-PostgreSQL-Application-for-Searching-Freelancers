@@ -14,16 +14,18 @@ next
 ```bash
 rails db:seed OR use ___BD_DUMP___.sql file for PostgreSQL DB
 ```
+
+<br/><br/>
+<img width="1212" height="616" alt="1" src="https://github.com/user-attachments/assets/3d7717f9-b54d-4287-bdfa-4ad538c3d144" />
+<br/><br/>
+<img width="1212" height="616" alt="2" src="https://github.com/user-attachments/assets/93a91f25-4c55-4681-bc7b-795f009df556" />
+<br/><br/>
+<img width="1212" height="616" alt="3" src="https://github.com/user-attachments/assets/729e9c29-f6d4-4fe9-bb66-82247d1d370d" />
+<br/><br/>
 <br/><br/>
 <img width="1212" height="616" alt="5" src="https://github.com/user-attachments/assets/ddb5d72d-7a60-4149-bb24-1f17153ee222" />
 <br/><br/>
 <img width="1212" height="616" alt="4" src="https://github.com/user-attachments/assets/76e0130a-6044-433c-833b-e0320d3949f4" />
-<br/><br/>
-<img width="1212" height="616" alt="3" src="https://github.com/user-attachments/assets/729e9c29-f6d4-4fe9-bb66-82247d1d370d" />
-<br/><br/>
-<img width="1212" height="616" alt="2" src="https://github.com/user-attachments/assets/93a91f25-4c55-4681-bc7b-795f009df556" />
-<br/><br/>
-<img width="1212" height="616" alt="1" src="https://github.com/user-attachments/assets/3d7717f9-b54d-4287-bdfa-4ad538c3d144" />
 <br/><br/>
 <img width="1212" height="616" alt="7" src="https://github.com/user-attachments/assets/18dbf101-8c48-4c4f-9573-b89907a43428" />
 <br/><br/>
