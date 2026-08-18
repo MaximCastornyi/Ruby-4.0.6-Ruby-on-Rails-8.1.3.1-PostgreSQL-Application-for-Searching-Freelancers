@@ -1,0 +1,17 @@
+{
+  "name": "app",
+  "private": true,
+  "dependencies": {
+    "@rails/actiontext": "^7.2.302",
+    "bulma": "^1.0.4",
+    "bulma-extensions": "^6.2.7",
+    "bulma-toast": "^2.4.4",
+    "jquery": "^4.0.0",
+    "raty-js": "^4.3.0",
+    "sass": "^1.102.0",
+    "trix": "^2.1.19"
+  },
+  "scripts": {
+    "build:css": "sass ./app/assets/stylesheets/application.bulma.scss:./app/assets/builds/application.css --no-source-map --load-path=node_modules --load-path=app/assets/stylesheets"
+  }
+}

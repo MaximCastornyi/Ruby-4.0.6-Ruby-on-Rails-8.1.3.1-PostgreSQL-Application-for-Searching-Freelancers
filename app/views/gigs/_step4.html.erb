@@ -1,0 +1,83 @@
+<div class="step-content <%= 'is-active' if @step == 4 %>">
+
+  <div class="field">
+    <label class="label">Youtube video url</label>
+    <%= f.text_field :video, autocomplete: "video url", class: "input" %>
+  </div>
+
+
+  <div class="field">
+  <label class="label">Build Your Gig Gallery</label>
+
+  <div class="control">
+    <!-- Округлая кнопка загрузки -->
+    <div class="m-b-20 has-text-centered">
+      <div class="dropzone" 
+           data-controller="dropzone" 
+           data-dropzone-url-value="<%= upload_photo_gig_path(@gig) %>">
+        <div class="dz-message needsclick">
+          + Drop files here to upload
+        </div>
+      </div>
+    </div>
+<br/><br/>
+    <!-- Загруженные фото -->
+    <div class="columns is-multiline" id="uploaded-photos" style="width: 100%">
+      <% if @gig.photos.attached? %>
+        <% @gig.photos.each do |photo| %>
+          <%= render 'gigs/photo', photo: photo, gig: @gig %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+  <br/><br/>
+
+  <!-- STEP 4 BUTTONS -->
+  <div class="field is-grouped is-grouped-centered mt-25">
+    <p class="control">
+      <%= link_to "Back", edit_gig_path(@gig, step: @step - 1), class: "button is-light" %>
+    </p>
+
+    <p class="control">
+      <%= f.submit "Save & Continue", class: "button is-primary" %>
+    </p>
+  </div>
+
+</div>
+
+<style>
+/* Делаем Dropzone компактной округлой кнопкой */
+.dropzone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: auto !important;
+  padding: 10px 24px !important;
+  border: 2px dashed #3273dc !important; /* Цвет границы */
+  border-radius: 2904e128px !important; /* Делает кнопку полностью округлой (pill button) */
+  background-color: #f5f5f5 !important;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Эффект при наведении */
+.dropzone:hover {
+  background-color: #eef3fc !important;
+  border-color: #2366d1 !important;
+}
+
+/* Текст внутри кнопки */
+.dropzone .dz-message {
+  margin: 0 !important;
+  font-size: 14px;
+  font-weight: 600;
+  color: #3273dc;
+}
+
+/* Скрываем стандартное превью Dropzone под кнопкой, если оно не нужно */
+.dropzone .dz-preview {
+  display: none !important;
+}
+</style>

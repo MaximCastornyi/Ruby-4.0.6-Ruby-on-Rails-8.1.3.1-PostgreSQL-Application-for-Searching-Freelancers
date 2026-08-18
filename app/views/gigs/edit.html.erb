@@ -1,0 +1,141 @@
+<section class="section">
+  <div class="container">
+    <!-- STEPS HEADER -->
+    <div class="steps-header">
+      <div class="step <%= 'active' if @step == 1 %> <%= 'completed' if @step > 1 %>">
+        <div class="marker">1</div>
+        <p class="title">Overview</p>
+      </div>
+      <div class="step <%= 'active' if @step == 2 %> <%= 'completed' if @step > 2 %>">
+        <div class="marker">2</div>
+        <p class="title">Pricing</p>
+      </div>
+      <div class="step <%= 'active' if @step == 3 %> <%= 'completed' if @step > 3 %>">
+        <div class="marker">3</div>
+        <p class="title">Description</p>
+      </div>
+      <div class="step <%= 'active' if @step == 4 %> <%= 'completed' if @step > 4 %>">
+        <div class="marker">4</div>
+        <p class="title">Gallery</p>
+      </div>
+      <div class="step <%= 'active' if @step == 5 %>">
+        <div class="marker">5</div>
+        <p class="title">Publish</p>
+      </div>
+    </div>
+
+    <!-- STEP CONTENT -->
+    <div class="steps-content">
+      <%= form_for @gig do |f| %>
+        <%= hidden_field_tag :step, @step %>
+        <% case @step %>
+        <% when 1 %>
+          <%= render 'step1', f: f, gig: @gig %>
+        <% when 2 %>
+          <%= render 'step2', f: f, gig: @gig %>
+        <% when 3 %>
+          <%= render 'step3', f: f, gig: @gig %>
+        <% when 4 %>
+          <%= render 'step4', f: f, gig: @gig %>
+        <% when 5 %>
+          <%= render 'step5', f: f, gig: @gig %>
+        <% end %>
+
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<style>
+textarea.textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  resize: vertical;
+}
+
+.section {
+  padding: 2rem 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.steps-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #999;
+  position: relative;
+  flex: 1;
+}
+
+.step .marker {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  background: #fff;
+  z-index: 1;
+}
+
+.step.active {
+  color: #2563eb;
+}
+
+.step.active .marker {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.step.completed {
+  color: #2563eb;
+}
+
+.step.completed .marker {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.step.completed::after {
+  background: #2563eb;
+}
+
+.step .title {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Линия между шагами */
+.step::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #ccc;
+  z-index: 0;
+}
+
+.step:last-child::after {
+  display: none;
+}
+</style>

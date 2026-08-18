@@ -1,0 +1,7 @@
+<p class="subtitle is-7 conversation-preview" id="<%= dom_id(conversation, :preview) %>">
+  <% if (last_msg = conversation.last_message) %>
+    <%= last_msg.user_id == user&.id ? "You: #{last_msg.content}" : last_msg.content %>
+  <% else %>
+    <em>No messages yet</em>
+  <% end %>
+</p>

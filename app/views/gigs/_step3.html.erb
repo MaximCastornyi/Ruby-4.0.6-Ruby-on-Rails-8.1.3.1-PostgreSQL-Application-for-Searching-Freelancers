@@ -1,0 +1,35 @@
+<div class="step-content <%= 'is-active' if @step == 3 %>">
+
+  <div class="field">
+    <label class="label">Description</label>
+
+    <%= f.rich_text_area :description,
+                         rows: 50,
+                         cols: 50 %>
+  </div>
+
+  <br/>
+
+  <!-- STEP 3 BUTTONS -->
+  <div class="field is-grouped is-grouped-centered mt-25">
+
+    <p class="control">
+      <%= link_to "Back",
+                  edit_gig_path(gig, step: @step - 1),
+                  class: "button is-light" %>
+    </p>
+
+    <p class="control">
+      <a href="" class="button is-light">
+        Cancel
+      </a>
+    </p>
+
+    <p class="control">
+      <%= f.submit "Save & Continue",
+                   class: "button is-primary" %>
+    </p>
+
+  </div>
+
+</div>

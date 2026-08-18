@@ -1,0 +1,103 @@
+<%= turbo_stream_from @order %>
+
+<section class="section">
+  <div class="container">
+    <div class="columns">
+
+      <!-- LEFT SIDE: Comments -->
+      <div class="column is-two-thirds">
+        <p class="menu-label">
+          Comments on your order
+        </p>
+        <hr>
+
+        <div id="comment-list">
+          <%= render partial: 'orders/comment', collection: @comments, as: :comment %>
+        </div>
+
+        <hr>
+
+        <article class="media">
+          <figure class="media-left">
+            <p class="image is-64x64">
+              <%= image_tag avatar_url(current_user), class: "is-rounded" %>
+            </p>
+          </figure>
+          <div class="media-content">
+            <%= form_with model: Comment.new,
+                          url: comments_path,
+                          id: "new_comment",
+                          data: { controller: "reset-form", action: "turbo:submit-end->reset-form#reset" } do |f| %>
+              <%= f.hidden_field :order_id, value: @order.id %>
+
+              <div class="field">
+                <%= f.text_area :content, class: "textarea", placeholder: "Type your comment...", rows: 3 %>
+              </div>
+            
+                <div class="field is-pulled-left">
+                    <div class="file is-warning has-name">
+                        <label class="file-label">
+                            <%= f.file_field :attachment_file, class: "file-input" %>
+                            <span class="file-cta">
+                                <span class="file-label">Attachment (Optional)</span>
+                            </span>
+                                <span class="file-name" id="file-name">No file selected</span>
+                        </label>
+                    </div>
+                </div>
+
+              <div class="field is-pulled-right">
+                <%= f.submit "Post comment", class: "button is-primary" %>
+              </div>
+            <% end %>
+          </div>
+        </article>
+      </div>
+
+      <!-- RIGHT SIDE: Order Details -->
+      <div class="column">
+        <div class="card">
+          <div class="card-image">
+            <figure class="image is-3by2">
+              <%= image_tag gig_cover(@gig) if @gig %>
+              <%= image_tag 'icon_default_image.png' if @request %>
+            </figure>
+          </div>
+          <div class="card-content">
+            <p>
+              <strong><%= @order.title %></strong>
+              <strong class="title is-4 is-pulled-right has-text-success">$<%= @order.amount %></strong>
+            </p>
+            <br>
+            <small>
+              <p>Seller: <%= @order.seller_name %></p>
+              <br>
+              <p>Order ID: <%= @order.id %></p>
+              <br>
+              <p><%= @order.created_at.strftime('%d, %b %Y') %></p>
+            </small>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const fileInput = document.querySelector(".file-input");
+    const fileName = document.querySelector(".file-name");
+
+    fileInput.addEventListener("change", function() {
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+
+        fileName.textContent = `${file.name} (${file.size} bytes)`;
+      } else {
+        fileName.textContent = "No file selected";
+      }
+    });
+  });
+</script>

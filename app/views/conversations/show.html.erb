@@ -1,0 +1,168 @@
+<%= turbo_stream_from "conversation_#{@conversation.id}_user_#{current_user.id}" %>
+
+<section class="section">
+  <div class="columns">
+
+    <!-- ========================= -->
+    <!-- Conversations list -->
+    <!-- ========================= -->
+
+    <div class="column is-4">
+      <nav class="menu">
+        <p class="menu-label">
+          All Conversations
+        </p>
+
+        <ul class="menu-list">
+          <% @conversations.each do |conversation| %>
+
+            <% client =
+              if conversation.sender_id == current_user.id
+                conversation.receiver
+              else
+                conversation.sender
+              end
+            %>
+
+            <li>
+              <%= link_to conversation_detail_path(client.id) do %>
+
+                <article
+                  class="message <%= 'is-primary' if conversation.id == @conversation.id %>"
+                  data-conversation-id="<%= conversation.id %>"
+                >
+                  <div class="message-body">
+
+                    <div class="media">
+
+                      <!-- Avatar -->
+                      <div class="media-left">
+                        <figure class="image is-32x32 m-r-5 avatar online">
+                          <%= image_tag avatar_url(client), class: "is-rounded" %>
+                        </figure>
+                      </div>
+
+                      <!-- User / last message -->
+                      <div class="media-content">
+                        <p class="title is-6">
+                          <%= client.full_name %>
+                        </p>
+
+<p class="subtitle is-7 conversation-preview" id="<%= dom_id(conversation, :preview) %>">
+  <% if (last_msg = conversation.last_message) %>
+    <%= last_msg.user_id == current_user.id ? "You: #{last_msg.content}" : last_msg.content %>
+  <% else %>
+    <em>No messages yet</em>
+  <% end %>
+</p>
+                      </div>
+
+                    </div>
+
+                  </div>
+                </article>
+
+              <% end %>
+            </li>
+
+          <% end %>
+        </ul>
+      </nav>
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- Current conversation -->
+    <!-- ========================= -->
+
+    <div class="column is-8">
+
+      <!-- Receiver profile -->
+
+      <article class="media">
+
+        <div class="media-left">
+          <figure class="image is-64x64">
+            <%= image_tag avatar_url(@user), class: "is-rounded" %>
+          </figure>
+        </div>
+
+        <div class="media-content">
+          <div class="content">
+
+            <h3>
+              <%= @user.full_name %>
+            </h3>
+
+            <small>
+              From: <%= @user.from %>
+            </small>
+
+            <br>
+
+            <small>
+              Language: <%= @user.language %>
+            </small>
+
+          </div>
+        </div>
+
+      </article>
+
+      <hr>
+
+
+      <!-- ========================= -->
+      <!-- Messages -->
+      <!-- ========================= -->
+
+      <div class="columns is-multiline" id="message_list">
+        <% @messages.each do |message| %>
+          <%= render "conversations/message", m: message, user: current_user %>
+        <% end %>
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- Send message -->
+      <!-- ========================= -->
+
+      <div class="column m-t-25">
+
+        <%= form_with model: Message.new,
+                      id: "new_message",
+                      data: { controller: "reset-form", action: "turbo:submit-end->reset-form#reset" } do |f| %>
+
+          <%= f.hidden_field :receiver_id, value: @user.id %>
+
+          <div class="field has-addons">
+
+            <div class="control" style="width: 100%">
+              <%= f.text_field :content,
+                    class: "input",
+                    placeholder: "Type a message...",
+                    autocomplete: "off" %>
+            </div>
+
+            <div class="control">
+              <%= f.submit "Send", class: "button is-primary" %>
+            </div>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .conversation-message {
+    margin-bottom: 5px !important;
+    padding: 10px !important;
+    font-size: 15px;
+  }
+</style>

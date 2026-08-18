@@ -1,0 +1,16 @@
+<%= turbo_stream.replace "new_comment" do %>
+  <%= form_with model: Comment.new,
+                url: comments_path,
+                id: "new_comment",
+                data: { controller: "reset-form", action: "turbo:submit-end->reset-form#reset" } do |f| %>
+    <%= f.hidden_field :order_id, value: @order.id %>
+
+    <div class="field">
+      <%= f.text_area :content, class: "textarea", placeholder: "Type your comment...", rows: 3 %>
+    </div>
+
+    <div class="field is-pulled-right">
+      <%= f.submit "Post comment", class: "button is-primary" %>
+    </div>
+  <% end %>
+<% end %>

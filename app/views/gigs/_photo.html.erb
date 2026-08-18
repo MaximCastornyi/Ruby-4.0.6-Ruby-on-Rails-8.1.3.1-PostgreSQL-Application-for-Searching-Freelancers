@@ -1,0 +1,16 @@
+<%# app/views/gigs/_photo.html.erb %>
+<div class="column is-one-fifth" id="photo_<%= photo.id %>">
+  <div class="card">
+    <div class="card-image">
+      <figure class="image is-4by3">
+        <%= image_tag photo %>
+      </figure>
+    </div>
+    <footer class="card-footer">
+      <%= link_to "Delete", 
+                  delete_photo_gig_path(gig, photo_id: photo.id), 
+                  data: { turbo_method: :delete, turbo_confirm: "Удалить фото?" }, 
+                  class: "card-footer-item button is-text has-text-danger" %>
+    </footer>
+  </div>
+</div>

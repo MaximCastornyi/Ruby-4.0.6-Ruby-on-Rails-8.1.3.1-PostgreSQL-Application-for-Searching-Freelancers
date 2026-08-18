@@ -1,0 +1,39 @@
+@import "bulma/bulma";
+@import "styles";
+
+#flash-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 350px;
+  z-index: 9999;
+}
+
+.flash-message {
+  width: 350px;
+  animation: slideIn 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, .15);
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.form-container {
+  margin-left: 100px;
+  margin-right: 100px;
+}
+
+.conversation-message {
+  margin-bottom: 5px !important;
+  padding: 10px !important;
+  font-size: 15px;
+}

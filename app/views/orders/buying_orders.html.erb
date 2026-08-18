@@ -1,0 +1,327 @@
+<section class="section">
+  <div class="container">
+
+    <p class="title">Manage Buying Orders</p>
+
+    <table class="table is-fullwidth">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Seller Name</th>
+          <th>Title</th>
+          <th>Due Date</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% if @orders.blank? %>
+          <tr>
+            <td colspan="7" class="has-text-centered">
+              <h1>NOTHING TO SHOW HERE</h1>
+            </td>
+          </tr>
+        <% end %>
+
+        <% @orders.each do |o| %>
+          <tr>
+            <td><%= o.created_at.strftime('%d %b %Y') %></td>
+            <td><%= o.seller_name %></td>
+            <td>
+              <%= link_to o.title, order_detail_path(o) %>
+            </td>
+            <td><%= o.due_date.strftime('%d %b %Y') %></td>
+            <td><%= o.amount %></td>
+            <td>
+              <span class="tag
+                <%= 'is-warning' if o.inprogress? %>
+                <%= 'is-success' if o.completed? %>">
+                <%= o.status.capitalize %>
+              </span>
+            </td>
+            <td>
+              <% unless o.completed? %>
+                <%= link_to(
+                  'Mark Complete',
+                  complete_order_path(o),
+                  data: { turbo_method: :put },
+                  class: 'button is-small is-primary'
+                ) %>
+              <% else %>
+                <!-- Rating button -->
+                <button
+                  type="button"
+                  class="button is-small is-outlined is-danger js-open-rating"
+                  data-modal-id="rating_modal_<%= o.id %>"
+                  data-order-id="<%= o.id %>">
+                  Rating
+                </button>
+
+                <!-- Rating modal -->
+                <div
+                  class="modal"
+                  id="rating_modal_<%= o.id %>"
+                  data-order-id="<%= o.id %>">
+
+                  <div class="modal-background"></div>
+                  <div class="modal-card">
+                    <header class="modal-card-head">
+                      <p class="modal-card-title">Leave a Review</p>
+                      <button
+                        type="button"
+                        class="delete js-close-rating"
+                        aria-label="close">
+                      </button>
+                    </header>
+
+                    <section class="modal-card-body">
+                      <%= form_with model: Review.new, local: true do |f| %>
+                        <%= f.hidden_field :order_id, value: o.id %>
+
+                        <!-- Rating -->
+                        <div class="field">
+                          <%= f.label :stars, "Rating", class: "label" %>
+                          <div id="star_<%= o.id %>" class="rating-stars"></div>
+                        </div>
+
+                        <!-- Review -->
+                        <div class="field">
+                          <%= f.label :review, "Review", class: "label" %>
+                          <div class="control">
+                            <%= f.text_area(
+                              :review,
+                              class: "textarea",
+                              placeholder: "Write your review..."
+                            ) %>
+                          </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="field is-grouped">
+                          <div class="control">
+                            <button
+                              type="button"
+                              class="button is-light js-close-rating">
+                              Cancel
+                            </button>
+                          </div>
+                          <div class="control">
+                            <%= f.submit(
+                              "Add Review",
+                              class: "button is-danger"
+                            ) %>
+                          </div>
+                        </div>
+                      <% end %>
+                    </section>
+                  </div>
+                </div>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+
+<script>
+document.addEventListener("turbo:load", () => {
+  /*
+   * SVG star creation
+   */
+  function createStarSvg(type) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 24 24");
+    svg.setAttribute("aria-hidden", "true");
+    svg.classList.add("rating-star-svg");
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute(
+      "d",
+      "M12 2.5l2.91 5.9 6.51.95-4.71 4.59 1.11 6.49L12 17.36l-5.82 3.07 1.11-6.49-4.71-4.59 6.51-.95L12 2.5z"
+    );
+
+    if (type.includes("star-on-png")) {
+      path.setAttribute("fill", "currentColor");
+      path.setAttribute("stroke", "currentColor");
+    } else {
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke", "currentColor");
+      path.setAttribute("stroke-width", "1.5");
+    }
+
+    svg.appendChild(path);
+    return svg;
+  }
+
+  /*
+   * Inject SVG into Raty <i> elements
+   */
+  function addSvgStars(container) {
+    const stars = container.querySelectorAll(
+      "i.star-on-png, i.star-off-png, i.star-half-png"
+    );
+
+    stars.forEach((star) => {
+      if (star.querySelector("svg")) return;
+
+      const svg = createStarSvg(star.className);
+      star.appendChild(svg);
+    });
+  }
+
+  /*
+   * Open modal
+   */
+  document.querySelectorAll(".js-open-rating").forEach((button) => {
+    button.addEventListener("click", () => {
+      const modalId = button.dataset.modalId;
+      const orderId = button.dataset.orderId;
+
+      const modal = document.getElementById(modalId);
+      const stars = document.getElementById(`star_${orderId}`);
+
+      if (!modal || !stars) return;
+
+      modal.classList.add("is-active");
+
+      // Initialize Raty only once
+      if (!stars.dataset.ratyInitialized) {
+        const raty = new Raty(stars, {
+          scoreName: "review[stars]",
+          score: 1,
+          number: 5,
+          starType: "i",
+        });
+
+        raty.init();
+        addSvgStars(stars);
+
+        stars.dataset.ratyInitialized = "true";
+      }
+    });
+  });
+
+  /*
+   * Close modal buttons
+   */
+  document.querySelectorAll(".js-close-rating").forEach((button) => {
+    button.addEventListener("click", () => {
+      const modal = button.closest(".modal");
+      if (modal) modal.classList.remove("is-active");
+    });
+  });
+
+  /*
+   * Close modal by clicking background
+   */
+  document.querySelectorAll(".modal-background").forEach((background) => {
+    background.addEventListener("click", () => {
+      const modal = background.closest(".modal");
+      if (modal) modal.classList.remove("is-active");
+    });
+  });
+
+  /*
+   * Close modal after Turbo form submit
+   */
+  document.querySelectorAll(".modal form").forEach((form) => {
+    form.addEventListener("turbo:submit-end", (event) => {
+      if (event.detail.success) {
+        const modal = form.closest(".modal");
+        if (modal) modal.classList.remove("is-active");
+        form.reset();
+      }
+    });
+  });
+});
+</script>
+
+<style>
+.rating-stars {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 40px;
+}
+
+
+/*
+ * Raty creates these <i> elements.
+ */
+.rating-stars i.star-on-png,
+.rating-stars i.star-off-png,
+.rating-stars i.star-half-png {
+  display: inline-flex;
+
+  width: 32px;
+  height: 32px;
+
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.12s ease,
+    color 0.12s ease;
+}
+
+
+/*
+ * Active star
+ */
+.rating-stars i.star-on-png {
+  color: #f59e0b;
+}
+
+
+/*
+ * Empty star
+ */
+.rating-stars i.star-off-png {
+  color: #cbd5e1;
+}
+
+
+/*
+ * Half star
+ */
+.rating-stars i.star-half-png {
+  color: #f59e0b;
+}
+
+
+/*
+ * SVG itself
+ */
+.rating-star-svg {
+  width: 30px;
+  height: 30px;
+
+  display: block;
+
+  pointer-events: none;
+}
+
+
+/*
+ * Hover
+ */
+.rating-stars i:hover {
+  transform: scale(1.15);
+}
+
+
+/*
+ * Hidden Rails/Raty score field
+ */
+.rating-stars input[type="hidden"] {
+  display: none;
+}
+</style>

@@ -1,0 +1,185 @@
+<nav class="navbar" style="background: #fcf156; z-index: 3;" role="navigation" aria-label="main navigation" style="background: #fcf156;">
+  <div class="navbar-brand" style="background: #fcf156;">
+    <a class="navbar-item ml-6" href="/" style="background: #fcf156;">
+      <%= image_tag "logo.jpg", alt: "Logo" %>
+    </a>
+
+    <a
+      role="button"
+      class="navbar-burger"
+      aria-label="menu"
+      aria-expanded="false"
+      data-target="navbarBasicExample" style="background: white">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start is-flex is-justify-content-center is-flex-grow-1">
+            <div class="navbar-item">
+              <div class="<%= 'is-hidden' if current_page?(root_path) %>">
+                <%= form_tag search_path, method: :get, class: "field has-addons" do %>
+                  <div class="control has-icons-left">
+                    <span class="icon is-small is-left">
+                      <i class="fa fa-search"></i>
+                    </span>
+                    <%= text_field_tag 'q', '', class: "input", placeholder: "Try 'logo design'" %>
+                  </div>
+                  <div class="control">
+                    <button class="button is-danger" type="submit">Search</button>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+        </div>
+
+    <div class="navbar-end">
+
+
+      <style> 
+      .post-gig:hover { background-color: #c49a00 !important; color: #fff !important; } 
+      </style>
+
+      <%= link_to 'Pricing', plans_path, class: "navbar-item post-gig" %>
+      <%= link_to 'Post Gig', new_gig_path, class: "navbar-item post-gig" %>
+      <%= link_to 'Browse Gigs', search_path, class: "navbar-item post-gig" %>
+
+
+                <% if (!user_signed_in?) %>
+
+                <div class="navbar-item">
+                    <div class="buttons">
+                    <%= link_to "Sign up", new_user_registration_path, class: "button is-primary" %>
+                    <%= link_to "Log in", new_user_session_path, class: "button is-light" %>
+                    </div>
+                </div>
+
+                <% else %>
+
+                <div class="navbar-item has-dropdown is-hoverable">
+
+                        <a class="navbar-link">
+                          <figure class="image is-24x24 m-r-5 avatar <%= current_user.status ? "online" : "offline" %>">
+                            <%= image_tag avatar_url(current_user), class: "is-rounded" %>
+                          </figure>
+                          <%= current_user.full_name %>
+                        </a>
+
+                        <div class="navbar-dropdown">
+                        <%= link_to "Profile", edit_user_registration_path, class: "navbar-item" %>
+                        <%= link_to 'Dashboard', dashboard_path, class: "navbar-item" %>
+                        <%= link_to 'Calendar', calendar_path, class: "navbar-item" %>
+                        <hr class="navbar-divider">
+                        <%= link_to "Log out",
+                                    destroy_user_session_path,
+                                    data: { turbo_method: :delete },
+                                    class: "navbar-item" %>
+                        </div>
+                </div>
+
+                <% end %>
+    </div>
+  </div>
+</nav>
+
+<% if (user_signed_in?) && !current_page?(root_path) && !current_page?(plans_path) && !current_page?(search_path) && !current_page?("/gigs/#{params[:id]}") && !current_page?("/users/#{params[:id]}") %>
+
+<nav class="navbar has-shadow" style=" z-index: 2;">
+  <div class="container">
+    <div class="navbar">
+      <%= link_to 'Dashboard', dashboard_path, class: "navbar-item" %>
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link">Selling</a>
+          <div class="navbar-dropdown">
+            <%= link_to 'Create new Gig', new_gig_path, class: "navbar-item" %>
+          </div>
+        </div>
+
+         <div class="navbar-item has-dropdown is-hoverable">
+            <a class="navbar-link">Buying</a>
+            <div class="navbar-dropdown">
+              <%= link_to 'Post Request', new_request_path, class: "navbar-item" %>
+              <%= link_to 'Manage Requests', requests_path, class: "navbar-item" %>
+            </div>
+          </div>
+
+
+          <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">Buyer Requests</a>
+              <div class="navbar-dropdown">
+                  <%= link_to 'Active Requests', all_requests_path, class: "navbar-item" %>
+                  <%= link_to 'Offers Sent', my_offers_path, class: "navbar-item" %>
+              </div>
+          </div>
+
+          <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">Orders</a>
+              <div class="navbar-dropdown">
+                  <%= link_to 'Selling Orders', selling_orders_path, class: "navbar-item" %>
+                  <%= link_to 'Buying Orders', buying_orders_path, class: "navbar-item" %>
+              </div>
+          </div>
+
+          <%= link_to 'Earnings', earnings_path, class: "navbar-item" %>
+          <%= link_to 'Messages', conversations_path, class: "navbar-item" %>
+
+          <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">Settings</a>
+              <div class="navbar-dropdown">
+                  <%= link_to 'Payment Method', settings_payment_path, class: "navbar-item" %>
+                  <%= link_to 'Payout Method', settings_payout_path, class: "navbar-item" %>
+              </div>
+          </div>
+
+
+    </div>
+  </div>
+</nav>
+
+<% end %>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const burgers = document.querySelectorAll(".navbar-burger");
+
+  burgers.forEach((burger) => {
+    burger.addEventListener("click", () => {
+      const target = burger.dataset.target;
+      const menu = document.getElementById(target);
+
+      burger.classList.toggle("is-active");
+      menu.classList.toggle("is-active");
+    });
+  });
+});
+</script>
+
+<style>
+.avatar {
+  position: relative;
+  display: inline-block;
+}
+
+.avatar::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+  border: 1px solid white;
+}
+
+.avatar.online::before {
+  background-color: #1dbf73;
+}
+
+.avatar.offline::before {
+  background-color: gray;
+}
+
+</style>

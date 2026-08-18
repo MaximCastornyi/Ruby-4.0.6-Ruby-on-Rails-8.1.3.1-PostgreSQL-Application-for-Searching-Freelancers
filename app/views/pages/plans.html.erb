@@ -1,0 +1,214 @@
+<section class="section">
+  <!-- Bulma CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  
+  <!-- Bulma Pricing Extension Custom CSS -->
+  <style>
+    .pricing-table {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .pricing-table .pricing-plan {
+      background-color: #ffffff;
+      border: 1px solid #eef2f5;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 260px;
+      max-width: 330px;
+      padding: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Эффект поднятия при наведении */
+    .pricing-table .pricing-plan:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+      border-color: #dbdbdb;
+    }
+
+    /* Заголовок карточки */
+    .pricing-plan .plan-header {
+      background-color: #fafafa;
+      color: #363636;
+      font-weight: 700;
+      font-size: 1.25rem;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      border-bottom: 1px solid #f0f0f0;
+      text-transform: capitalize;
+    }
+
+    /* Блок цены */
+    .pricing-plan .plan-price {
+      background-color: #ffffff;
+      padding: 1.5rem 1rem;
+      text-align: center;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .pricing-plan .plan-price .plan-price-amount {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #363636;
+      line-height: 1;
+    }
+
+    .pricing-plan .plan-price .plan-price-amount .currency {
+      font-size: 1.5rem;
+      vertical-align: super;
+      margin-right: 2px;
+      color: #7a7a7a;
+    }
+
+    .pricing-plan .plan-price .plan-price-period {
+      display: block;
+      font-size: 0.85rem;
+      color: #7a7a7a;
+      margin-top: 0.5rem;
+      font-weight: 500;
+    }
+
+    /* Список преимуществ */
+    .pricing-plan .plan-items {
+      flex-grow: 1;
+      padding: 1rem 0;
+      background-color: #ffffff;
+    }
+
+    .pricing-plan .plan-item {
+      padding: 0.75rem 1rem;
+      text-align: center;
+      color: #4a4a4a;
+      font-size: 0.95rem;
+      border-bottom: 1px dashed #f5f5f5;
+    }
+
+    .pricing-plan .plan-item:last-child {
+      border-bottom: none;
+    }
+
+    /* Кнопка в подвале */
+    .pricing-plan .plan-footer {
+      padding: 1.25rem 1.5rem;
+      background-color: #ffffff;
+    }
+
+    /* Акцентный центральный тариф (Popular) */
+    .pricing-table .pricing-plan.is-active {
+      border: 2px solid #485fc7;
+      transform: scale(1.04);
+      box-shadow: 0 10px 25px rgba(72, 95, 199, 0.15);
+      z-index: 2;
+    }
+
+    .pricing-table .pricing-plan.is-active:hover {
+      transform: scale(1.04) translateY(-4px);
+    }
+
+    .pricing-table .pricing-plan.is-active .plan-header {
+      background-color: #485fc7;
+      color: #ffffff;
+    }
+
+    /* Бейдж "Popular" на 2-й карточке */
+    .pricing-plan.is-active::before {
+      content: 'Popular';
+      position: absolute;
+      top: 12px;
+      right: -30px;
+      background: #00d1b2;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 30px;
+      transform: rotate(45deg);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  </style>
+
+  <% 
+    # Резервный список на случай, если из Stripe/контроллера пришло менее 3 планов
+default_plans = [
+    { 'id' => 'plan_enterprise_high', 'nickname' => 'Enterprise', 'amount' => 10000, 'metadata' => { 'commission' => '10%' } },
+    { 'id' => 'plan_basic',           'nickname' => 'Basic',      'amount' => 1500,  'metadata' => { 'commission' => '10%' } },
+    { 'id' => 'plan_enterprise_low',  'nickname' => 'Enterprise', 'amount' => 500,   'metadata' => { 'commission' => '10%' } }
+  ]
+    # Безопасный сбор доступных планов
+    loaded_plans = @plans&.data || []
+    plans_to_display = (loaded_plans + default_plans).first(3)
+  %>
+
+  <div class="container">
+    <div class="has-text-centered mb-6">
+      <h1 class="title is-3 has-text-weight-bold">Choose the best package for your business</h1>
+    </div>
+
+    <div class="pricing-table">
+      <% plans_to_display.each_with_index do |plan, index| %>
+        <% 
+          # Извлекаем значения независимо от того, является ли объект Stripe::Plan или Hash
+          nickname   = plan.respond_to?(:nickname) ? plan.nickname : plan['nickname']
+          amount     = (plan.respond_to?(:amount) ? plan.amount : plan['amount']) || 0
+          
+          # Извлечение комиссии из metadata
+          metadata   = plan.respond_to?(:metadata) ? plan.metadata : plan['metadata']
+          commission = metadata&.[]('commission') if metadata.respond_to?(:[])
+          commission ||= '5%'
+
+          # Выделяем центральную (вторую) карточку
+          is_popular = (index == 1)
+        %>
+
+        <div class="pricing-plan <%= 'is-active' if is_popular %>">
+          <div class="plan-header">
+            <%= nickname || "Plan ##{index + 1}" %>
+          </div>
+          
+          <div class="plan-price">
+            <span class="plan-price-amount">
+              <span class="currency">$</span><%= amount / 100 %>
+            </span>
+            <span class="plan-price-period">/ month</span>
+          </div>
+          
+          <div class="plan-items">
+            <div class="plan-item">
+              Commission fee is <strong><%= commission %></strong>
+            </div>
+            <div class="plan-item">
+              Full Platform Access
+            </div>
+            <div class="plan-item">
+              24/7 Dedicated Support
+            </div>
+          </div>
+          
+            <div class="plan-footer">
+            <% 
+                # Универсальное извлечение ID плана (для Stripe API и для Hash)
+                plan_id = plan.respond_to?(:id) ? plan.id : (plan['id'] || plan[:id])
+            %>
+
+            <%= form_with url: subscribe_path do |f| %>
+                <%= f.hidden_field :plan_id, value: plan_id %>
+                <button type="submit" class="button is-fullwidth <%= is_popular ? 'is-link' : 'is-link is-light' %> has-text-weight-semibold">
+                Choose <%= nickname %>
+                </button>
+            <% end %>
+            </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,127 @@
+<section class="section">
+  <div class="container is-flex is-flex-direction-column is-align-items-center">
+    <h1 class="title mb-5">Calendar</h1>
+
+    <!-- Скрипт FullCalendar v6 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+    <!-- Контейнер календаря -->
+    <div id="calendar" style="width: 700px; max-width: 100%; min-height: 500px; background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 6px;"></div>
+  </div>
+</section>
+
+<script>
+  // Безопасно передаем данные заказов из Rails в JS
+  var ordersData = <%= raw @orders.to_json %>;
+
+  function formatOrdersForCalendar(orders) {
+    var now = new Date();
+    // 2 дня в миллисекундах: 2 * 24 * 60 * 60 * 1000
+    var twoDaysLater = new Date(now.getTime() + (2 * 24 * 60 * 60 * 1000));
+
+    return orders.map(function(o) {
+      var dueDate = new Date(o.due_date);
+      var code = '#ffdd57'; // Желтый (по умолчанию)
+
+      if (dueDate < now) {
+        code = '#ff3860'; // Красный (просрочен)
+      } else if (dueDate > twoDaysLater) {
+        code = '#23d160'; // Зеленый (более 2 дней)
+      }
+
+      return {
+        id: o.id,
+        title: o.buyer_name || ('Заказ #' + o.id),
+        start: o.due_date,
+        end: o.due_date,
+        backgroundColor: code
+      };
+    });
+  }
+
+  function initCalendar() {
+    var calendarEl = document.getElementById('calendar');
+    if (!calendarEl || typeof FullCalendar === 'undefined') return;
+
+    // Очищаем предыдущий инстанс при перезагрузке через Turbo
+    if (calendarEl._calendar) {
+      calendarEl._calendar.destroy();
+    }
+
+    // Читаем start_date из query параметров URL
+    var urlParams = new URLSearchParams(window.location.search);
+    var startDateParam = urlParams.get('start_date');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      initialDate: startDateParam || undefined,
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth,dayGridWeek'
+      },
+      events: formatOrdersForCalendar(ordersData),
+      
+      // Переход на страницу заказа при клике
+      eventClick: function(info) {
+        window.location.href = "/orders/" + info.event.id;
+      },
+
+      // Обработчик переключения месяцев для загрузки данных из Rails
+      customButtons: {
+        prev: {
+          click: function() {
+            calendar.prev();
+            updateUrlDate(calendar.getDate());
+          }
+        },
+        next: {
+          click: function() {
+            calendar.next();
+            updateUrlDate(calendar.getDate());
+          }
+        },
+        today: {
+          text: 'today',
+          click: function() {
+            calendar.today();
+            updateUrlDate(calendar.getDate());
+          }
+        }
+      }
+    });
+
+    calendar.render();
+    calendarEl._calendar = calendar;
+  }
+
+  // Вспомогательная функция для обновления start_date в URL и перезагрузки страницы
+  function updateUrlDate(date) {
+    var dateStr = date.toISOString().split('T')[0];
+    window.location.search = '?start_date=' + dateStr;
+  }
+
+  // Поддержка обычного DOMContentLoaded и Turbo Drive
+  document.addEventListener("DOMContentLoaded", initCalendar);
+  document.addEventListener("turbo:load", initCalendar);
+  document.addEventListener("turbolinks:load", initCalendar);
+</script>
+
+<style>
+/* Изменение фона прошлых дней в FullCalendar v6 */
+.fc .fc-day-past {
+  background-color: #f5f5f5 !important;
+}
+
+/* Настройки отображения эвентов */
+.fc-event {
+  border: none !important;
+  cursor: pointer;
+}
+
+.fc-event-title {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 2px 4px;
+}
+</style>

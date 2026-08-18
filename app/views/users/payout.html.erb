@@ -1,0 +1,46 @@
+<style>
+.StripeElement {
+  box-sizing: border-box;
+
+  height: 40px;
+  padding: 10px 12px;
+
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background-color: white;
+  box-shadow: 0 1px 3px 0 #e6ebf1;
+  -webkit-transition: box-shadow 150ms ease;
+  transition: box-shadow 150ms ease;
+}
+
+.StripeElement--focus {
+  box-shadow: 0 1px 3px 0 #cfd7df;
+}
+
+.StripeElement--invalid {
+  border-color: #fa755a;
+}
+
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
+}
+</style>
+
+
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8-tablet is-6-desktop is-6-widescreen">
+        <p class="title has-text-centered">Payout Method</p>
+            <%= form_with url: update_payout_path, local: true do |f| %>
+                <div class="field">
+                    <%= f.text_field :paypal, value: current_user.paypal, placeholder: "Your Paypal Email", class: "input" %>
+                </div>
+                <div class="field is-grouped is-grouped-centered">
+                    <%= f.submit "Save", class: "button is-primary" %>
+                </div>
+            <% end %>     
+      </div>
+    </div>
+  </div>
+</section>

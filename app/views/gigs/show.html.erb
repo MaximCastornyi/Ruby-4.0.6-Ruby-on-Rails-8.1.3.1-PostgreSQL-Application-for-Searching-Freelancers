@@ -1,0 +1,296 @@
+<% content_for :head do %>
+  <meta name="turbolinks-cache-control" content="no-cache">
+<% end %>
+
+
+<%= render 'shared/categories' %>
+
+<section class="section">
+  <div class="container">
+    <div class="columns">
+
+      <!-- LEFT SIDE -->
+      <div class="column is-two-thirds">
+        <div class="columns is-multiline">
+
+          <!-- Carousel Container -->
+          <div class="column is-full">
+            <div class="card">
+              <div class="card-content">
+                <p class="title is-4"><%= @gig.title %></p>
+              </div>
+              <hr>
+
+              <!-- Stimulus Carousel Container -->
+              <div class="carousel-wrapper" data-controller="carousel">
+
+                <!-- Стрелка ВЛЕВО -->
+                <button type="button" class="carousel-nav prev" data-action="click->carousel#prev">
+                  &#10094;
+                </button>
+
+                <!-- Контейнер со слайдами -->
+                <div class="gig-carousel" data-carousel-target="container">
+                  <!-- Видео из YouTube (если указано) -->
+                  <% if @gig.video.present? %>
+                    <%
+                      match = @gig.video.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/)
+                      youtube_id = match ? match[1] : @gig.video
+                    %>
+                    <div class="carousel-item image is-16by9">
+                      <iframe src="https://www.youtube-nocookie.com/embed/<%= youtube_id %>"
+                              frameborder="0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowfullscreen
+                              style="width: 100%; height: 100%; border-radius: 6px;"></iframe>
+                    </div>
+                  <% end %>
+
+                  <!-- Фотографии гига -->
+                  <% if @gig.photos.attached? %>
+                    <% @gig.photos.each do |photo| %>
+                      <div class="carousel-item image is-16by9">
+                        <%= image_tag photo, style: "width: 100%; height: 100%; object-fit: cover; border-radius: 6px;" %>
+                      </div>
+                    <% end %>
+                  <% elsif !@gig.video.present? %>
+                    <!-- Заглушка, если нет ни фото, ни видео -->
+                    <div class="carousel-item image is-16by9">
+                      <%= image_tag 'icon_default_image.png', style: "width: 100%; height: 100%; object-fit: cover; border-radius: 6px;" %>
+                    </div>
+                  <% end %>
+                </div>
+
+                <!-- Стрелка ВПРАВО -->
+                <button type="button" class="carousel-nav next" data-action="click->carousel#next">
+                  &#10095;
+                </button>
+
+              </div>
+
+            </div>
+          </div>
+
+          <!-- About Section -->
+          <div class="column is-full">
+            <div class="card">
+              <div class="card-content">
+                <article class="media">
+                  <div class="media-content">
+                    <p><strong>About This Gig</strong></p>
+                    <hr>
+                    <%= @gig.description %>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT SIDE -->
+      <div class="column">
+        <div class="columns is-multiline">
+
+          <!-- Pricing Section -->
+          <div class="column is-full" data-controller="tabs">
+
+            <!-- Вкладки -->
+            <div class="tabs is-fullwidth" id="tabs">
+              <ul>
+                <% Pricing.pricing_types.each do |key, value| %>
+                  <li class="tab <%= 'is-active' if value == 0 %>"
+                      data-tab="<%= key %>"
+                      style="<%= 'display: none;' if @gig.has_single_pricing && value != 0 %>">
+                    <a><%= key.capitalize %></a>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+
+            <!-- Контент вкладок -->
+            <div class="tabs-content">
+              <% @gig.pricings.each_with_index do |p, index| %>
+                <% p_value = Pricing.pricing_types[p.pricing_type] %>
+
+                <!-- Показывать только первый таб (index == 0), остальные скрывать -->
+                <div class="tab-content"
+                     id="tab-<%= p.pricing_type %>"
+                     style="<%= 'display: none;' if index != 0 || (@gig.has_single_pricing && p_value != 0) %>">
+                  <div class="card">
+                    <div class="card-content">
+                      <div class="media">
+                        <div class="media-content">
+                          <strong><%= p.title %></strong>
+                        </div>
+                        <div class="media-right">
+                          <p class="title is-4">$<%= p.price %></p>
+                        </div>
+                      </div>
+
+                      <div class="content f-15">
+                        <p class="m-t-30"><%= p.description %></p>
+                        <p class="m-t-30">
+                          <strong><i class="far fa-clock"></i> <%= pluralize(p.delivery_time, 'Day') %> Delivery</strong>
+                        </p>
+                      </div>
+
+                      <% if @gig.active %>
+                        
+                      <%= link_to "Continue ($#{p.price})", checkout_path(id: @gig.id, pricing_type: p.pricing_type), class: "button is-danger" %>
+                      <% else %>
+                        <button class="button is-fullwidth is-danger" disabled>
+                          Not Available
+                        </button>
+                      <% end %>
+
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+
+          </div>
+
+          <!-- Profile Section -->
+          <div class="column is-full">
+            <div class="card">
+                <div class="card-content is-flex is-justify-content-center">
+                <%= link_to users_path(@gig.user) do %>
+                  <figure class="image is-128x128">
+                      <%= image_tag avatar_url(@gig.user), class: "is-rounded" %>
+                  </figure>
+                <% end %>
+                </div>
+              <div class="card-content f-15">
+                <div class="content has-text-centered">
+                  <p class="title is-5"><%= @gig.user.full_name %></p>
+                  <button class="button is-black is-outlined is-fullwidth">Contact me</button>
+                </div>
+                <article class="media">
+                  <div class="media-content">
+                    <i class="fas fa-user m-r-5"></i> Member since
+                  </div>
+                  <div class="media-right">
+                    <%= @gig.user.created_at.strftime('%b %Y') %>
+                  </div>
+                </article>
+                <article class="media">
+                  <div class="media-content">
+                    <i class="fas fa-map-marker-alt m-r-5"></i> From
+                  </div>
+                  <div class="media-right">
+                    <%= @gig.user.from %>
+                  </div>
+                </article>
+                <article class="media">
+                  <div class="media-content">
+                    <%= @gig.user.about %>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .carousel-wrapper {
+    position: relative;
+    padding: 0 1.5rem 1.5rem 1.5rem;
+  }
+
+  .gig-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 6px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Скрываем полосу прокрутки */
+  .gig-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  .gig-carousel .carousel-item {
+    flex: 0 0 100%;
+    width: 100%;
+    scroll-snap-align: start;
+  }
+
+  /* Стиль кружков со стрелками */
+  .carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #dbdbdb;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #363636;
+    transition: all 0.2s ease;
+  }
+
+  .carousel-nav:hover {
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    transform: translateY(-50%) scale(1.05);
+  }
+
+  .carousel-nav.prev {
+    left: 25px;
+  }
+
+  .carousel-nav.next {
+    right: 25px;
+  }
+</style>
+
+<script>
+  const initTabs = () => {
+    const tabs = document.querySelectorAll('#tabs li');
+    const tabContents = document.querySelectorAll('.tabs-content .tab-content');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const targetTab = tab.getAttribute('data-tab');
+
+        // 1. Переключаем активный класс на вкладках
+        tabs.forEach(t => t.classList.remove('is-active'));
+        tab.classList.add('is-active');
+
+        // 2. Отображаем только выбранный контент
+        tabContents.forEach(content => {
+          if (content.id === `tab-${targetTab}`) {
+            content.style.display = 'block';
+          } else {
+            content.style.display = 'none';
+          }
+        });
+      });
+    });
+  };
+
+  // Поддержка обычного DOM и Rails Hotwire/Turbo / Turbolinks
+  document.addEventListener('DOMContentLoaded', initTabs);
+  document.addEventListener('turbo:load', initTabs);
+  document.addEventListener('turbolinks:load', initTabs);
+</script>

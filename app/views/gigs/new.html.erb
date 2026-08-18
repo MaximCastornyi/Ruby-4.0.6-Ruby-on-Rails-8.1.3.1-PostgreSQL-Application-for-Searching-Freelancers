@@ -1,0 +1,237 @@
+<section class="section">
+  <div class="container">
+    <!-- STEPS HEADER -->
+    <div class="steps-header">
+      <div class="step <%= 'active' if @step == 1 %>">
+        <div class="marker">1</div>
+        <p class="title">Overview</p>
+      </div>
+      <div class="step <%= 'active' if @step == 2 %>">
+        <div class="marker">2</div>
+        <p class="title">Pricing</p>
+      </div>
+      <div class="step <%= 'active' if @step == 3 %>">
+        <div class="marker">3</div>
+        <p class="title">Description</p>
+      </div>
+      <div class="step <%= 'active' if @step == 4 %>">
+        <div class="marker">4</div>
+        <p class="title">Gallery</p>
+      </div>
+      <div class="step <%= 'active' if @step == 5 %>">
+        <div class="marker">5</div>
+        <p class="title">Publish</p>
+      </div>
+    </div>
+
+    <!-- STEP CONTENT -->
+    <div class="steps-content">
+    <%= form_for @gig do |f| %>
+    <div class="field">
+        <label class="label">Gig Title</label>
+        <%= f.text_area :title, autocomplete: "title", class: "textarea" %>
+    </div>
+    <div class="field">
+        <label class="label">Category</label>
+        <%= f.select :category_id, options_for_select(@categories.map { |c| [c.name, c.id] }) %>
+    </div>
+    <div class="field is-grouped is-grouped-centered mt-25">
+        <a href="" class="button is-light">Cancel</a>
+        <%= f.submit "Save & Continue", class: "button is-primary" %>
+    </div>
+    <% end %>
+    </div>
+  </div>
+</section>
+
+<style>
+
+textarea.textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  resize: vertical; /* чтобы можно было растягивать */
+}
+
+.section {
+  padding: 2rem 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.steps-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #999;
+}
+
+.step .marker {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.step.active {
+  color: #2563eb; /* синий */
+}
+
+.step.active .marker {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.step .title {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.steps-content {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.field {
+  margin-bottom: 1rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem;
+  # border: 1px solid #ccc;
+  # border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button.cancel {
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  color: #333;
+}
+
+.button.cancel:hover {
+  background: #eee;
+}
+
+.button.primary {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+}
+
+.button.primary:hover {
+  background: #1d4ed8;
+}
+
+.steps-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #999;
+  position: relative;
+  flex: 1;
+}
+
+.step .marker {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  background: #fff;
+  z-index: 1;
+}
+
+.step.active {
+  color: #2563eb;
+}
+
+.step.active .marker {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.step .title {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Линия между шагами */
+.step::after {
+  content: "";
+  position: absolute;
+  top: 16px; /* по центру маркера */
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: #ccc;
+  z-index: 0;
+}
+
+.step:last-child::after {
+  display: none; /* убираем линию после последнего шага */
+}
+
+/* Активная линия */
+.step.active::after {
+  background: #2563eb;
+}
+
+
+</style>
