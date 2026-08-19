@@ -14,6 +14,7 @@ next
 ```bash
 rails db:seed OR use ___BD_DUMP___.sql file for PostgreSQL DB
 ```
+In the second way use login 'admin@admin.com' and password '123456789'
 
 <br/><br/>
 <img width="1212" height="616" alt="1" src="https://github.com/user-attachments/assets/3d7717f9-b54d-4287-bdfa-4ad538c3d144" />
